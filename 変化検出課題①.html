@@ -221,7 +221,7 @@ function registerClickHandler(stim) {
     }
   };
 
-  area.addEventListener('click', handler, { once: true });
+  area.addEventListener('mousedown', handler, { once: true });
 }
 
 jsPsych.run(timeline);
