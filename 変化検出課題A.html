@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>変化検出課題</title>
+  <script src="https://unpkg.com/jspsych@7.3.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response"></script>
+</head>
+<body>
+<script>
+const jsPsych = initJsPsych({
+  override_safe_mode: true,
+  on_finish: function () {
+    const data = jsPsych.data.get().filter({task: 'response'}).values();
+    const results = {};
+    data.forEach(d => {
+      const q = d.question_number;
+      if (!(q in results) && d.rt !== -1) {
+        results[q] = d.skipped ? null : (d.rt !== -1 ? d.rt : null);
+      }
+    });
+
+    let html = `
+    <div style="background-color:#f5f5f5;width:100vw;height:100vh; padding: 40px; box-sizing: border-box;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h3>お疲れ様でした。以上で変化検出課題は終了です。<br>ご協力いただきありがとうございました。</h3>
+      </div>
+
+      <div style="width: 80%; margin: 0 auto; display: flex; flex-direction: row; gap: 40px;">
+        <!--左:表-->
+        <div style="flex: 1; overflow: auto;">
+          <h3>【反応時間の結果一覧】</h3>
+          <table border="1" style="border-collapse: collapse;width: 100%; text-align: center;">
+            <tr><th>問題</th><th>反応時間</th></tr>
+    `;
+
+    for (let i = 1; i <= 10; i++) {
+      if (results[i] == null) {
+        html += `<tr><td>第${i}問</td><td></td></tr>`;
+      } else {
+        html += `<tr><td>第${i}問</td><td>${(results[i] / 1000).toFixed(2)} 秒</td></tr>`;
+      }
+    }
+
+    html += `
+          </table>
+        </div>
+
+        <!--右:文章と画像-->
+        <div style="flex: 1; padding-left: 20px; padding-right: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;">
+          <p style="font-size: 16px; line-height: 1.6; margin: 0; text-align: center;">
+            左の表をスマートフォンまたはPCで撮影し、以下のQRコードまたはURLより提出してください。
+          </p>
+          <img src="本調査(実験後A).png" alt="本調査A" style="max-width: 280px; height: auto; border: 1px solid #ccc;">
+          <a href="https://forms.office.com/r/HvAERDijhB" target="_blank" style="font-size: 16px; color: #007bff; text-decoration: underline;">
+            https://forms.office.com/r/HvAERDijhB
+          </a>
+        </div> 
+
+      </div>
+    </div>
+  `;
+
+  document.body.innerHTML = html;
+  }
+});
+
+const timeline = [];
+
+function skipListener(e) {
+  if (e.key === 'Enter' && !window.clicked) {
+    window.skipped = true;
+    jsPsych.endCurrentTimeline();
+  }
+}
+
+// 説明と開始
+timeline.push({
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: '<div style="text-align:center; background-color:#f5f5f5; width:100vw; height:100vh;"><br><br><br><br><br><br><h2>変化検出課題</h2><p>これから全10問の変化検出課題を出題します。<br>同じ場面の画像が交互に表示されますので、変化した部分をクリックしてください。<br>(※分からない場合は、エンターキーを押して次の問題に進むことができます。)</p><h3>スペースキーで開始</h3></div>',
+  choices: [' ']
+});
+
+// 各問題の情報
+const trials = [
+  { base: 'img5a.jpg', change: 'img5b.jpg', correct: { x1: 0, x2: 1477, y1: 0, y2: 831 } },
+  { base: 'img17a.jpg', change: 'img17b.jpg', correct: { x1: 0, x2: 1477, y1: 0, y2: 831 } },
+  { base: 'img25a.jpg', change: 'img25b.jpg', correct: { x1: 0, x2: 1477, y1: 0, y2: 831 } },
+  { base: 'img26a.jpg', change: 'img26b.jpg', correct: { x1: 0, x2: 1477, y1: 0, y2: 831 } },
+  { base: 'img29a.jpg', change: 'img29b.jpg', correct: { x1: 0, x2: 1477, y1: 0, y2: 831 } },
+  { base: 'img32a.jpg', change: 'img32b.jpg', correct: { x1: 0, x2: 1477, y1: 0, y2: 831 } },
+  { base: 'img33a.jpg', change: 'img33b.jpg', correct: { x1: 0, x2: 1477, y1: 0, y2: 831 } },
+  { base: 'img35a.jpg', change: 'img35b.jpg', correct: { x1: 0, x2: 1477, y1: 0, y2: 831 } },
+  { base: 'img36a.jpg', change: 'img36b.jpg', correct: { x1: 0, x2: 1477, y1: 0, y2: 831 } },
+  { base: 'img37a.jpg', change: 'img37b.jpg', correct: { x1: 0, x2: 1477, y1: 0, y2: 831 } }
+];
+
+// 各問題の処理
+trials.forEach((stim, index) => {
+  timeline.push({
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: `<div style="text-align:center; background-color:#f5f5f5; width:100vw; height:100vh;"><br><br><br><br><br><br><br><br><h2>第${index + 1}問：スペースキーで開始</h2></div>`,
+    choices: [' '],
+    on_start: () => {
+      window.clicked = false;
+      window.skipped = false;
+      window.clickedTime = null;
+      window.startTime = null;
+    },
+    on_finish: () => {
+      window.startTime = performance.now();  // ← 正しいスタート時間を記録
+    }
+  });
+
+  timeline.push({
+    timeline: [
+      {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: () => createImageHTMLWithImage(stim.base),
+        trial_duration: 500,
+        choices: "NO_KEYS",
+        on_load: () => {
+          registerClickHandler(stim);
+          document.addEventListener('keydown', skipListener);
+        }, 
+        on_finish: () => {
+          document.removeEventListener('keydown', skipListener);
+        }
+      },
+
+      {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: createGrayHTML(),
+        trial_duration: 125,
+        choices: "NO_KEYS",
+        on_load: () => {
+          registerClickHandler(stim);
+          document.addEventListener('keydown', skipListener);
+        },
+        on_finish: () => {
+          document.removeEventListener('keydown', skipListener);
+        }
+      },
+      {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: () => createImageHTMLWithImage(stim.change),
+        trial_duration: 500,
+        choices: "NO_KEYS",
+        on_load: () => {
+          registerClickHandler(stim);
+          document.addEventListener('keydown', skipListener);
+        },
+        on_finish: () => {
+          document.removeEventListener('keydown', skipListener);
+        }
+      },
+      {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: createGrayHTML,
+        trial_duration: 125,
+        choices: "NO_KEYS",
+        on_load: () => {
+          registerClickHandler(stim);
+          document.addEventListener('keydown', skipListener);
+        },
+        on_finish: () => {
+          document.removeEventListener('keydown', skipListener);
+        }
+      }
+    ],
+    loop_function: () => !window.clicked && !window.skipped
+  });
+
+  timeline.push({
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: '',
+    trial_duration:1,
+    choices: "NO_KEYS",
+    on_finish: (data) => {
+      data.rt = (window.clicked && window.startTime) ? window.clickedTime - window.startTime : -1;
+      data.task = 'response';
+      data.question_number = index + 1;
+      data.skipped = window.skipped;
+    }
+  })
+});
+
+// 画像を表示するHTML生成関数
+function createImageHTMLWithImage(image) {
+  return `
+    <div id="click-area" style="width:100vw;height:100vh;position:relative;cursor:pointer;background-color:gray;">
+      <img src="${image}" style="width:100vw;height:100vh;object-fit:contain;position:absolute;background-color:gray;">
+    </div>
+  `;
+}
+
+function createGrayHTML() {
+  return `
+    <div id="click-area" style="width:100vw;height:100vh;position:relative;cursor:pointer;background-color:gray;">
+    </div>
+  `;
+}
+
+function registerClickHandler(stim) {
+  const area = document.getElementById('click-area');
+  if (!area) return;
+
+  // 一度登録済みかどうか判定して重複登録を防ぐ（例）
+  if (area._clickHandlerRegistered) return;
+  area._clickHandlerRegistered = true;
+
+  const handler = (e) => {
+    // 多重クリック防止したければここでフラグ管理
+    if (window.clicked) return;
+
+    const rect = area.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (1477 / rect.width);
+    const y = (e.clientY - rect.top) * (831 / rect.height);
+
+    if (x >= stim.correct.x1 && x <= stim.correct.x2 &&
+        y >= stim.correct.y1 && y <= stim.correct.y2) {
+      window.clicked = true;
+      window.clickedTime = performance.now();
+      jsPsych.endCurrentTimeline();
+
+      // 必要ならフラグ解除は処理完了後に行う
+    }
+  };
+
+  area.addEventListener('mousedown', handler); // once: true は外す
+}
+
+jsPsych.run(timeline);
+</script>
+</body>
+</html>
