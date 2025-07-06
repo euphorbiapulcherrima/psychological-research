@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>心理学ゼミ 本調査</title>
+    <script src="https://unpkg.com/jspsych@7.3.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response"></script>
+    <style>
+      body {margin:0; background-color: #f5f5f5; padding: 20px;}
+    </style>
+
+
+    <script>
+      const imageList = [
+        "img5a.jpg",
+        "img5b.jpg",
+        "img17a.jpg",
+        "img17b.jpg",
+        "img25a.jpg",
+        "img25b.jpg",
+        "img26a.jpg",
+        "img26b.jpg",
+        "img29a.jpg",
+        "img29b.jpg",
+        "img32a.jpg",
+        "img32b.jpg",
+        "img33a.jpg",
+        "img33b.jpg",
+        "img35a.jpg",
+        "img35b.jpg",
+        "img36a.jpg",
+        "img36b.jpg",
+        "img37a.jpg",
+        "img37b.jpg"
+      ];
+
+      const preloadImages = () => {
+        imageList.forEach(src => {
+          const img = new Image();
+          img.src = src;
+        });
+      };
+
+      window.addEventListener('load', preloadImages)
+    </script>
+</head>
+<body>
+    <div style="text-align: center;">
+       <h1>卒業研究　本調査</h1>
+    </div> 
+    <div style="display: flex; justify-content: center; gap: 100px; margin: 0 auto;">
+      <div style="text-align: center;">
+        <a href="本調査A.html"><img src="S__63045657_0.jpg" alt="Aグループ" style="width: 300px;"></a>
+        <h1>A</h1>
+      </div>
+      <div style="text-align: center;">
+       <a href="本調査B.html"><img src="S__63045659_0.jpg" alt="Bグループ" style="width: 300px;"></a>
+       <h1>B</h1>
+      </div>
+    </div>
+</body>
+</html>
